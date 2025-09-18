@@ -24,6 +24,12 @@ class Main:
             
             game.show_last_move(screen)
             game.show_pieces(screen)
+
+            
+            mouseX,mouseY = pygame.mouse.get_pos()
+            mouse_col,mouse_row = mouseX//SQSIZE,mouseY//SQSIZE
+            game.hover_sqr = Square(mouse_row,mouse_col)
+            game.show_hover(screen)
             
             
 
@@ -66,7 +72,9 @@ class Main:
                         released_x, released_y = event.pos
                         released_row,released_col = released_y//SQSIZE, released_x//SQSIZE
                         initial = Square(dragger.initial_row, dragger.initial_col)
-                        final = Square(released_row,released_col)
+                        final_piece = board.squares[released_row][released_col].piece
+                        print(final_piece)
+                        final = Square(released_row,released_col,final_piece)
                         move = Move(initial,final)
                         
                         if board.valid_move(dragger.piece,move):
@@ -84,6 +92,12 @@ class Main:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_t:
                         print("Press T")
                         game.change_theme()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                        print("Press R")   
+                        game.reset() 
+                        game = self.game
+                        board = game.board
+                        dragger  = game.dragger
 
                     
 
