@@ -69,7 +69,7 @@ class Game:
         if self.hover_sqr:
             color = (180,180,180)
             rect = (self.hover_sqr.col * SQSIZE, self.hover_sqr.row * SQSIZE, SQSIZE,SQSIZE)
-            pygame.draw.rect(surface,color,rect)
+            pygame.draw.rect(surface,color,rect,width=3)
 
 
     def next_turn(self):
@@ -83,3 +83,5 @@ class Game:
             self.config.capture_sound.play()
         else :
             self.config.move_sound.play()
+    def reset(self):
+        self.__init__()
