@@ -2,7 +2,7 @@ from const import *
 from square import *
 from piece import *
 from move import *
-
+import copy
 class Board:
     def __init__(self):
         self.squares = []
@@ -26,7 +26,7 @@ class Board:
         piece.moved = True
 
         # ===== Nhập thành =====
-        if piece.name == "King":
+        if isinstance(piece, King):
             # nhập thành ngắn (sang phải 2 ô)
             if final.col - initial.col == 2:
                 rook_initial = Square(initial.row, 7)   # xe ở h1/h8
@@ -46,6 +46,11 @@ class Board:
                 self.squares[rook_initial.row][rook_initial.col].piece = None
                 self.squares[rook_final.row][rook_final.col].piece = rook
                 rook.moved = True
+        # ===== Phong hậu ======
+        if isinstance(piece,Pawn):
+            if final.row == 0 or final.row == 7:
+                self.squares[final.row][final.col].piece = Queen(piece.color)
+
 
 
     
@@ -56,7 +61,21 @@ class Board:
                 return True
         return False
         
-    
+    def in_check(self, piece,move):
+        temp_board = copy.deepcopy(self)
+        temp_piece = copy.deepcopy(piece)
+        temp_board.move(temp_piece,move)
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                if temp_board.squares[row][col].can_rival(temp_piece.color):
+                    p =  temp_board.squares[row][col].piece
+                    temp_board.calc_possiable_piece(p, row,col,False)
+                    
+                    for m in p.moves:
+                        if isinstance(m.final.piece, King):
+                            return True
+        return False
 
     def _create(self):
         # Tạo bàn cờ 8x8 rỗng
@@ -67,7 +86,7 @@ class Board:
             for col in range(COLS):
                 self.squares[row][col] = Square(col, row)
 
-    def calc_possiable_piece(self, piece, row,col):
+    def calc_possiable_piece(self, piece, row,col,bool = True):
         pass
         def knight_moves():
              possiable_moves = [
@@ -85,7 +104,10 @@ class Board:
                   if Square.in_board(move_col,move_row):
                        if self.squares[move_row][move_col].isempty_or_rival(piece.color):
                             initial = Square(row,col)
-                            final = Square(move_row,move_col)
+                            final_piece = self.squares[move_row][move_col].piece
+
+                            final = Square(move_row, move_col, final_piece)
+                            # final = Square(move_row,move_col)
                             move = Move(initial,final)
                             piece._add_moves(move)
         def pawn_moves():
@@ -96,9 +118,19 @@ class Board:
                  if Square.in_board(move_row):
                       if self.squares[move_row][col].isempty():
                            initial = Square(row,col)
-                           final = Square(move_row,col)
+                           final_piece = self.squares[move_row][col].piece
+
+                           final = Square(move_row, col, final_piece)
+                        #    final = Square(move_row,col)
                            move = Move(initial,final)
-                           piece._add_moves(move)
+                           if bool:
+                               print(self.in_check(piece,move))
+                               if not self.in_check(piece,move):
+
+                                piece._add_moves(move)
+                               
+                           else:
+                               piece._add_moves(move)
                       else:break
                  else:break
             possiable_move_row = row + piece.dir   # chỉ một giá trị
@@ -109,9 +141,18 @@ class Board:
                 if Square.in_board(move_row, move_col):
                     if self.squares[move_row][move_col].can_rival(piece.color):
                         initial = Square(row, col)
-                        final = Square(move_row, move_col)
+                        final_piece = self.squares[move_row][move_col].piece
+
+                        final = Square(move_row, move_col, final_piece)
                         move = Move(initial, final)
-                        piece._add_moves(move)
+                        if bool:
+                               print(self.in_check(piece,move))
+                               if not self.in_check(piece,move):
+
+                                piece._add_moves(move)
+                               
+                        else:
+                            piece._add_moves(move)
                     
 
         def straightline_moves(incrs):
@@ -123,7 +164,10 @@ class Board:
                 while Square.in_board(move_row, move_col):
 
                     initial = Square(row, col)
-                    final = Square(move_row, move_col)
+                    final_piece = self.squares[move_row][move_col].piece
+
+                    final = Square(move_row, move_col, final_piece)
+                    
                     move = Move(initial, final)
 
                     # Nếu ô trống → add move và tiếp tục đi tiếp
@@ -155,7 +199,10 @@ class Board:
                 if Square.in_board(move_row, move_col):
                     if self.squares[move_row][move_col].isempty_or_rival(piece.color):
                         initial = Square(row, col)
-                        final = Square(move_row, move_col)
+                        final_piece = self.squares[move_row][move_col].piece
+
+                        final = Square(move_row, move_col, final_piece)
+                        
                         move = Move(initial, final)
                         piece._add_moves(move)
 
