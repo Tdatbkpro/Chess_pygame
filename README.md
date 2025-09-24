@@ -1,8 +1,7 @@
 # ♟️ CHESS AI – Python P2P  
 
 Một trò chơi **cờ vua** được viết bằng **Python** với 2 chế độ:  
-
-- **Người chơi vs AI (Minimax / Alpha-Beta Pruning)**  
+ 
 - **Người chơi vs Người chơi (P2P – Peer to Peer)** thông qua socket  
 
 ## 🚀 Tính năng
